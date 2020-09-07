@@ -20,7 +20,7 @@ func (s *NovelService) GetNovelByUrl(novelUrl string) (*Novel, error) {
 	if err != nil {
 		return nil, err
 	}
-	status, contents, err := fetcher.Fetcher(novelUrl, "", 5)
+	status, contents, err := fetcher.Fetcher(novelUrl, "", 30)
 	if err != nil || status != http.StatusOK {
 		return nil, errors.New("访问站点失败")
 	}

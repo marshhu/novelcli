@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"errors"
 	"flag"
 	"fmt"
 	"github.com/marshhu/novelcli/service"
@@ -28,6 +29,13 @@ func init() {
 }
 
 func main() {
+	defer func() {
+		if err := recover(); err != nil {
+			fmt.Printf("ERROR: %s\n", err)
+			os.Exit(1)
+		}
+	}()
+
 	flag.Parse()
 
 	if h {
@@ -37,38 +45,49 @@ func main() {
 	if g {
 		//fmt.Fprintf(os.Stderr, "s:%s\n",s)
 		//fmt.Fprintf(os.Stderr, "d:%s\n",d)
-		if !strings.HasPrefix(s,"https://www.biquge.com.cn"){
-			fmt.Fprint(os.Stderr, "Currently only supports generating novel text from Biquge(www.biquge.com.cn)\n")
+		if !strings.HasPrefix(s, "https://www.biquge.com.cn") {
+			fmt.Fprintln(os.Stderr, "Currently only supports generating novel text from Biquge(www.biquge.com.cn)")
 			return
 		}
-		if len(d) <=0{
-			fmt.Fprint(os.Stderr, "begin generate novel text...\n")
+		if len(d) <= 0 {
+			fmt.Fprintln(os.Stderr, "begin generate novel text...")
 			return
 		}
-		fmt.Fprint(os.Stderr, "begin generate novel text...\n")
-		novelService := service.NovelService{}
-		novel, err := novelService.GetNovelByUrl(s)
+
+		fmt.Fprintln(os.Stderr, "begin generate novel text...")
+		err := generateNovelText(s,d)
 		if err != nil {
-			fmt.Fprint(os.Stderr, "crawler novel failed!")
+			fmt.Fprintln(os.Stderr, err.Error())
+			return
 		}
-		var buffer bytes.Buffer
-		for _, chapter := range novel.Chapters {
-			buffer.WriteString(chapter.Name + "\n\n")
-			buffer.WriteString(chapter.Content + "\n\n")
-		}
-		filePath := d + "/" + novel.Name + ".txt"
-		err = utils.WriteFile(filePath, buffer.Bytes())
-		if err != nil {
-			fmt.Fprint(os.Stderr, "generate novel text failed!")
-		}
-		fmt.Fprintf(os.Stderr, "novel text path:%s", filePath)
+		fmt.Fprintln(os.Stderr, "generate novel success,file path:"+d)
 	}
 }
 
 func usage() {
-	fmt.Fprintf(os.Stderr, `novlecli version: novlecli/1.0.0
-      Usage: novlecli [-hg] [-s url] [-d path]
-      Options:
-     `)
+	fmt.Fprintf(os.Stderr, "novelcli version: novelcli/1.0.0\n"+
+		"Usage: novelcli [-hg] [-s novel url] [-d save path]\n"+
+		"Options:\n")
 	flag.PrintDefaults()
+}
+
+//生成小说text文本
+func generateNovelText(url, savePath string) error {
+	novelService := service.NovelService{}
+	novel, err := novelService.GetNovelByUrl(url)
+	if err != nil {
+		fmt.Println(err.Error())
+		return errors.New("crawler novel failed")
+	}
+	var buffer bytes.Buffer
+	for _, chapter := range novel.Chapters {
+		buffer.WriteString(chapter.Name + "\n\n")
+		buffer.WriteString(chapter.Content + "\n\n")
+	}
+	filePath := savePath + "/" + novel.Name + ".txt"
+	err = utils.WriteFile(filePath, buffer.Bytes())
+	if err != nil {
+		return errors.New("generate novel text failed")
+	}
+	return nil
 }
