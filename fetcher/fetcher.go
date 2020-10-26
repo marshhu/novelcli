@@ -3,17 +3,18 @@ package fetcher
 import (
 	"bufio"
 	"errors"
-	"golang.org/x/net/html/charset"
-	"golang.org/x/text/encoding"
-	"golang.org/x/text/encoding/simplifiedchinese"
-	"golang.org/x/text/encoding/unicode"
-	"golang.org/x/text/transform"
 	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"strings"
 	"time"
+
+	"golang.org/x/net/html/charset"
+	"golang.org/x/text/encoding"
+	"golang.org/x/text/encoding/simplifiedchinese"
+	"golang.org/x/text/encoding/unicode"
+	"golang.org/x/text/transform"
 )
 
 func Fetcher(url string, cookie string, timeout int) (httpStatus int, body []byte, err error) {
@@ -22,7 +23,7 @@ func Fetcher(url string, cookie string, timeout int) (httpStatus int, body []byt
 	}
 	client := &http.Client{Timeout: time.Duration(timeout) * time.Second}
 	req, _ := http.NewRequest("GET", url, nil)
-	userAgent := "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36"
+	userAgent := "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.111 Safari/537.36"
 	req.Header.Add("User-Agent", userAgent)
 
 	if len(cookie) > 0 {
@@ -31,6 +32,7 @@ func Fetcher(url string, cookie string, timeout int) (httpStatus int, body []byt
 
 	resp, error := client.Do(req)
 	if error != nil || resp == nil {
+		log.Println(error.Error())
 		return 0, nil, errors.New("获取失败")
 	}
 

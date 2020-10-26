@@ -2,13 +2,14 @@ package service
 
 import (
 	"errors"
-	"github.com/marshhu/novelcli/fetcher"
-	"github.com/marshhu/novelcli/parser"
-	"github.com/marshhu/novelcli/parser/biquge"
 	"net/http"
 	"net/url"
 	"sort"
 	"sync"
+
+	"github.com/marshhu/novelcli/fetcher"
+	"github.com/marshhu/novelcli/parser"
+	"github.com/marshhu/novelcli/parser/biquge"
 )
 
 type NovelService struct {
@@ -20,7 +21,7 @@ func (s *NovelService) GetNovelByUrl(novelUrl string) (*Novel, error) {
 	if err != nil {
 		return nil, err
 	}
-	status, contents, err := fetcher.Fetcher(novelUrl, "", 30)
+	status, contents, err := fetcher.Fetcher(novelUrl, "", 60)
 	if err != nil || status != http.StatusOK {
 		return nil, errors.New("访问站点失败")
 	}
