@@ -12,7 +12,7 @@ func init() {
 }
 
 var rootCmd = &cobra.Command{
-	Use:   "novel",
+	Use:   "novelcli",
 	Short: "novel cli tools",
 	Long:  `generate novels from web url`,
 	Run: func(cmd *cobra.Command, args []string) {
