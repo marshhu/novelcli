@@ -67,9 +67,9 @@ func createWorkerPool(numOfWorkers int, requestChan chan string, resultChan chan
 func worker(requestChan <-chan string, resultChan chan FetchResult, wg *sync.WaitGroup) {
 	defer wg.Done()
 	for request := range requestChan {
-		status, contents, err := fetcher.Fetcher(request, "", 5)
+		status, contents, err := fetcher.Fetcher(request, "", 0)
 		if err != nil || status != http.StatusOK {
-			continue
+			return
 		}
 		fetchResult := FetchResult{Url: request, Content: contents}
 		resultChan <- fetchResult

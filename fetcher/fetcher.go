@@ -21,6 +21,9 @@ func Fetcher(url string, cookie string, timeout int) (httpStatus int, body []byt
 	if !strings.HasPrefix(url, "http://") && !strings.HasPrefix(url, "https://") {
 		return 0, nil, errors.New("url格式错误")
 	}
+	if timeout == 0 {
+		timeout = 60
+	}
 	client := &http.Client{Timeout: time.Duration(timeout) * time.Second}
 	req, _ := http.NewRequest("GET", url, nil)
 	userAgent := "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.111 Safari/537.36"
